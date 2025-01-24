@@ -48,6 +48,32 @@ class TaskManager:
         else:
             print("Invalid task index.")
 
+    def update_task(self, index, new_title=None, new_description=None, new_due_date=None, new_priority=None):
+        if 0 <= index < len(self.tasks):
+            if new_title:
+                self.tasks[index].title = new_title
+            if new_description:
+                self.tasks[index].description = new_description
+            if new_due_date:
+                self.tasks[index].due_date = new_due_date
+            if new_priority is not None:
+                self.tasks[index].priority = new_priority
+            print("Task updated successfully.")
+        else:
+            print("Invalid task index.")
+
+    def search_tasks(self, keyword):
+        results = [
+            (idx + 1, task) for idx, task in enumerate(self.tasks)
+            if keyword.lower() in task.title.lower() or keyword.lower() in task.description.lower()
+        ]
+        if results:
+            print("\nSearch Results:")
+            for idx, task in results:
+                print(f"{idx}. {task.title} | Due: {task.due_date} | Priority: {task.priority}")
+        else:
+            print("No tasks found matching the keyword.")
+
     def save_tasks(self, filename="tasks.json"):
         with open(filename, "w") as file:
             json.dump([task.to_dict() for task in self.tasks], file)
@@ -71,8 +97,10 @@ def main():
         print("1. Add Task")
         print("2. List Tasks")
         print("3. Delete Task")
-        print("4. Save Tasks")
-        print("5. Exit")
+        print("4. Update Task")
+        print("5. Search Tasks")
+        print("6. Save Tasks")
+        print("7. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -92,14 +120,30 @@ def main():
             manager.delete_task(index)
 
         elif choice == "4":
-            manager.save_tasks()
+            manager.list_tasks()
+            index = int(input("Enter task index to update: ")) - 1
+            print("Leave fields blank to keep them unchanged.")
+            new_title = input("Enter new title: ")
+            new_description = input("Enter new description: ")
+            new_due_date = input("Enter new due date: ")
+            new_priority = input("Enter new priority (1-5): ")
+            new_priority = int(new_priority) if new_priority.isdigit() else None
+            manager.update_task(index, new_title, new_description, new_due_date, new_priority)
 
         elif choice == "5":
+            keyword = input("Enter keyword to search: ")
+            manager.search_tasks(keyword)
+
+        elif choice == "6":
+            manager.save_tasks()
+
+        elif choice == "7":
             print("Goodbye!")
             break
 
         else:
             print("Invalid choice. Please try again.")
+
 
 if __name__ == "__main__":
     main()
